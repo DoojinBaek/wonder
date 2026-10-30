@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeHami 짧은 문장판</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1d2026;
+    --muted: #6b7280;
+    --accent: #2f5fb3;
+    --soft: #edf2fa;
+    --line: #e3e6ea;
+    --alt: #c05f0c;
+    --alt-soft: #fbefe3;
+  }
+  body { margin: 0; background: #e9e9ec; }
+
+  .slide {
+    width: 1920px; height: 1080px;
+    padding: 110px 140px;
+    box-sizing: border-box;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #fff;
+    color: var(--ink);
+    font: 400 40px/1.45 "Pretendard", -apple-system, sans-serif;
+    word-break: keep-all; overflow-wrap: break-word;
+    display: flex; flex-direction: column; gap: 40px;
+  }
+  .slide h1 { font-size: 96px; line-height: 1.15; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+  .slide h2 { font-size: 64px; line-height: 1.2; font-weight: 750; margin: 0; letter-spacing: -0.015em; }
+  .slide h3 { font-size: 44px; font-weight: 700; margin: 0; }
+  .slide p { margin: 0; }
+  .slide ul, .slide ol { margin: 0; padding-left: 1.1em; }
+  .slide li + li { margin-top: 18px; }
+  .slide blockquote { margin: 0; padding-left: 32px; border-left: 6px solid var(--line); color: var(--muted); }
+  .slide code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.88em; background: var(--soft); padding: 0.08em 0.3em; border-radius: 6px; }
+  .slide pre { margin: 0; padding: 24px 32px; background: var(--soft); border-radius: 12px; font-size: 30px; line-height: 1.5; white-space: pre-wrap; }
+  .slide pre code { background: none; padding: 0; font-size: inherit; }
+  .slide a { color: var(--accent); }
+  .slide .muted { color: var(--muted); }
+  .slide .hl { color: var(--accent); }
+  .slide .kicker { font-size: 30px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .slide .lead { font-size: 46px; color: var(--muted); }
+  .slide .small { font-size: 32px; }
+
+  .slide.title { justify-content: center; background: var(--soft); }
+  .slide.title .sub { font-size: 44px; color: var(--muted); }
+  .slide.title .meta { font-size: 32px; color: var(--muted); margin-top: 40px; }
+  .slide.center { justify-content: center; align-items: center; text-align: center; }
+  .slide.section { justify-content: center; background: var(--accent); color: #fff; }
+  .slide.section .kicker, .slide.section .lead { color: rgba(255, 255, 255, 0.75); }
+
+  .slide .cols { display: flex; gap: 80px; flex: 1; min-height: 0; }
+  .slide .cols > * { flex: 1; min-width: 0; }
+  .slide .cols > div > * + * { margin-top: 24px; }
+  .slide .cols > .wide { flex: 1.6; }
+  .slide .card { background: var(--soft); border-radius: 24px; padding: 40px 48px; display: flex; flex-direction: column; gap: 20px; font-size: 36px; }
+  .slide div.card > * + * { margin-top: 0; }
+  .slide .card h3 { font-size: 40px; color: var(--accent); }
+  .slide .card.alt { background: var(--alt-soft); }
+  .slide .card.alt h3 { color: var(--alt); }
+  .slide .callout { border-left: 8px solid var(--accent); padding: 6px 0 6px 36px; font-size: 42px; font-weight: 600; }
+  .slide .stat { font-size: 120px; line-height: 1; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+  .slide .foot { margin-top: auto; font-size: 26px; color: var(--muted); }
+  .slide figure { margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  .slide figure img, .slide figure svg { width: 100%; height: auto; }
+  .slide figcaption { font-size: 28px; color: var(--muted); }
+
+  .slide table { border-collapse: collapse; font-size: 34px; }
+  .slide th, .slide td { padding: 14px 28px; border-bottom: 2px solid var(--line); text-align: left; }
+  .slide th { color: var(--muted); font-weight: 600; }
+  .slide tr.hl td { background: var(--soft); font-weight: 650; }
+
+  .slide div.shape[data-shape] { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px 20px; box-sizing: border-box; }
+  .slide div.shape[data-shape] > * { margin: 0; }
+
+  .slide .math.display { font-size: 52px; text-align: center; }
+  .slide .eqs { display: flex; flex-direction: column; gap: 32px; }
+  .slide .eqs > div { display: flex; align-items: center; gap: 48px; }
+  .slide .eqs .eqlabel { width: 260px; flex: none; font-size: 34px; font-weight: 700; color: var(--accent); }
+  .slide .eqs .math.display { flex: 1; min-width: 0; font-size: 44px; text-align: left; margin: 0; }
+  .slide .eqs .katex-display { margin: 0; }
+  .slide .eqs .katex-display > .katex { text-align: left; }
+  .slide details { font-size: 32px; }
+  .slide summary { display: inline-block; list-style: none; cursor: pointer; padding: 0.2em 0.9em; border: 3px solid var(--accent); border-radius: 14px; color: var(--accent); font-weight: 650; }
+  .slide summary::-webkit-details-marker { display: none; }
+  .slide summary::after { content: " ▸"; }
+  .slide details[open] > summary::after { content: " ▾"; }
+  .slide details[open] > summary { margin-bottom: 20px; }
+  .slide button, .slide input, .slide select, .slide textarea { font: inherit; font-size: 0.85em; color: inherit; }
+  .slide button { padding: 0.3em 1em; border: 3px solid var(--accent); border-radius: 14px; background: #fff; color: var(--accent); font-weight: 650; cursor: pointer; }
+  .slide button:hover { background: var(--soft); }
+  .slide input, .slide select, .slide textarea { padding: 0.25em 0.5em; border: 2px solid var(--line); border-radius: 10px; }
+  .slide input[type=range] { accent-color: var(--accent); padding: 0; border: 0; }
+  .slide .pageno { position: absolute; right: 60px; bottom: 40px; font-size: 24px; color: var(--muted); }
+
+  /* this deck */
+  /* wonder theme. scripts/new-deck.mjs copies this into deck.html's <style>;
+  the base CSS that `deck build` adds comes before it, so these rules only adjust it.
+  Two meaning colors: blue (--accent) for the main object, orange (--alt) for what comes
+  from outside it (a condition, a competing method). Say in the deck what each one means. */
+
+  .slide { font-family: "IBM Plex Sans KR", -apple-system, sans-serif; font-size: 36px; line-height: 1.55; gap: 44px; }
+  .slide code, .slide pre, .slide .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .slide h2 { font-size: 56px; font-weight: 700; line-height: 1.28; letter-spacing: -0.01em; }
+  .slide p { max-width: 1400px; }
+
+  /* the one phrase that carries the slide */
+  .slide b { font-weight: 700; background: linear-gradient(transparent 60%, rgba(47, 95, 179, .2) 60%); }
+  .slide .blue { color: var(--accent); }
+  .slide .orange { color: var(--alt); }
+
+  /* a text block and a figure block; the figure takes the space that is left */
+  .slide .text { display: flex; flex-direction: column; gap: 26px; }
+  .slide .fig { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+  .slide .fig > svg, .slide .fig > img { display: block; max-width: 100%; max-height: 100%; margin: 0 auto; }
+  .slide .note { font-size: 26px; line-height: 1.45; color: var(--muted); }
+
+  /* side: text on the left, figure on the right */
+  .slide .side { flex: 1; min-height: 0; display: grid; grid-template-columns: 660px 1fr; column-gap: 80px; align-items: start; }
+  .slide .side > .fig { align-self: stretch; }
+
+  /* stack: the same figure in rows, all visible, compared at a glance */
+  .slide .stack { display: grid; grid-template-columns: 230px 1fr; column-gap: 36px; row-gap: 26px; align-items: center; }
+  .slide .stack > .label { font-size: 30px; font-weight: 600; line-height: 1.35; }
+
+  /* a formula, then one line on its colored terms */
+  .slide .eq { display: flex; flex-direction: column; gap: 14px; }
+  .slide .eq .math.display { font-size: 46px; text-align: left; margin: 0; }
+  .slide .eq .katex-display { margin: 0; }
+  .slide .eq .katex-display > .katex { text-align: left; }
+  .slide .eq .terms { font-size: 30px; color: var(--muted); }
+
+  /* folds: depth one click away */
+  .slide details { font-size: 30px; color: var(--muted); }
+  .slide summary { font-size: 28px; padding: 0.15em 0.8em; border-width: 2px; }
+  .slide details[open] > summary { margin-bottom: 14px; }
+  .slide details > p + p { margin-top: 12px; }
+
+  /* cover: what it is, then a direct answer */
+  .slide.title { background: #fff; gap: 36px; }
+  .slide.title h1 { font-size: 84px; font-weight: 700; max-width: 1640px; }
+  .slide.title .answer { font-size: 38px; line-height: 1.6; max-width: 1450px; }
+  .slide.title .meta { font-size: 28px; color: var(--muted); margin-top: 0; }
+
+  /* last slide: summary, then sources */
+  .slide .refs { margin-top: auto; display: flex; flex-direction: column; gap: 10px; font-size: 26px; line-height: 1.45; color: var(--muted); }
+  .slide .refs p { max-width: none; }
+
+  /* this deck */
+
+  .slide .fig > img { width: 100%; height: auto; max-height: 100%; object-fit: contain; }
+  .slide .fig .src { font-size: 24px; color: var(--muted); text-align: right; }
+  .slide .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+.slide ul, .slide ol { margin: 0; }
+.slide li + li { margin-top: 8px; }
+</style>
+<script type="module">
+/* wonder widgets: copied from the skill's assets/widgets.js; documented in references/layouts.md */
+// Wonder widgets: ready-made live elements for explainer decks. new-deck.mjs copies this file into
+// the deck's assets/ and loads it as a module; a slide then needs only the tag and its data.
+// Every widget reads the theme's colors, uses 28px+ text, fills the width of its parent, and
+// explains in its first state (decks are printed as they first appear).
+//
+// Colors in data are names: accent (blue), alt (orange), gray, purple, ink.
+//   <line-chart>     curves from data, static
+//   <bar-chart>      horizontal bars, static
+//   <dot-rows>       points on a shared number line, one row per case, optional slider
+//   <slider-plot>    a function of x with one parameter on a slider
+//   <step-through>   a pipeline of boxes; buttons walk through the steps
+//   <predict-reveal> a question with choices; the answer shows after a choice
+
+const css = getComputedStyle(document.documentElement);
+const V = n => css.getPropertyValue(n).trim();
+const FONT = '"IBM Plex Sans KR", -apple-system, sans-serif';
+const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+const color = c => ({ accent: V('--accent') || '#2f5fb3', alt: V('--alt') || '#c05f0c', gray: '#9aa1ab', purple: '#7c4dbd', ink: V('--ink') || '#1d2026' }[c] || c || V('--accent'));
+const json = (el, name, fallback) => { try { return JSON.parse(el.dataset[name]); } catch { return fallback; } };
+const nums = s => (s || '').split(',').map(Number);
+const fmt = v => String(Math.round(v * 100) / 100);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const BASE = `:host { display: block; font: 30px/1.4 ${FONT}; color: ${V('--ink')}; }
+  button { font: inherit; font-size: 28px; padding: 6px 22px; border: 3px solid ${V('--accent')}; border-radius: 14px;
+    background: #fff; color: ${V('--accent')}; font-weight: 600; cursor: pointer; }
+  button[disabled] { opacity: .35; cursor: default; }
+  input[type=range] { width: 640px; accent-color: ${V('--accent')}; }
+  .mono { font-family: ${MONO}; }
+  .read { font-size: 28px; color: ${V('--muted')}; }`;
+const once = el => { if (el.shadowRoot) return null; return el.attachShadow({ mode: 'open' }); };
+
+// Axes for a plot: maps data to an SVG box and draws ticks.
+function axes({ W, H, x, y, xlabel = '', ylabel = '', xlog = false }) {
+  const L = 96, R = 24, T = 20, B = 70;
+  const tx = v => xlog ? Math.log10(v) : v;
+  const X = v => L + (tx(v) - tx(x[0])) / (tx(x[1]) - tx(x[0])) * (W - L - R);
+  const Y = v => H - B - (v - y[0]) / (y[1] - y[0]) * (H - T - B);
+  const ticks = (a, b, log) => {
+    if (log) { const out = []; for (let e = Math.ceil(Math.log10(a)); e <= Math.floor(Math.log10(b)); e++) out.push(10 ** e); return out; }
+    const span = b - a, step = 10 ** Math.floor(Math.log10(span / 4)), m = span / step > 8 ? step * 2 : span / step > 4 ? step : step / 2;
+    const out = []; for (let v = Math.ceil(a / m) * m; v <= b + 1e-9; v += m) out.push(Math.round(v * 1e6) / 1e6); return out;
+  };
+  let g = `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="#c9ced6" stroke-width="2"/>`;
+  for (const v of ticks(x[0], x[1], xlog)) g += `<text x="${X(v)}" y="${H - B + 34}" text-anchor="middle" font-size="24" fill="#8a919b">${fmt(v)}</text>`;
+  for (const v of ticks(y[0], y[1], false)) g += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#eef0f3" stroke-width="2"/><text x="${L - 14}" y="${Y(v) + 8}" text-anchor="end" font-size="24" fill="#8a919b">${fmt(v)}</text>`;
+  if (xlabel) g += `<text x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle" font-size="26" fill="#6b7280">${esc(xlabel)}</text>`;
+  if (ylabel) g += `<text x="${L}" y="${T - 2}" font-size="26" fill="#6b7280" dominant-baseline="hanging" dx="8">${esc(ylabel)}</text>`;
+  return { X, Y, g, L, R, T, B };
+}
+const svg = (W, H, inner) => `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block" font-family='${FONT}'>${inner}</svg>`;
+
+// <line-chart data-series='[{"name":"InfiLoop","color":"accent","x":[…],"y":[…]},{"name":"TRM","color":"alt","dash":true,…}]'
+//   data-x="0,1872" data-y="0,100" data-xlabel="층 수" data-ylabel="정확도 (%)" [data-xlog] [data-height="560"]
+//   [data-marks='[{"x":468,"y":62.2,"label":"468층 62.2%","color":"alt"}]']>
+customElements.define('line-chart', class extends HTMLElement {
+  connectedCallback() {
+    const root = once(this); if (!root) return;
+    const series = json(this, 'series', []), marks = json(this, 'marks', []);
+    const W = 1100, H = +(this.dataset.height || 520);
+    const allX = series.flatMap(s => s.x), allY = series.flatMap(s => s.y);
+    const x = this.dataset.x ? nums(this.dataset.x) : [Math.min(...allX), Math.max(...allX)];
+    const y = this.dataset.y ? nums(this.dataset.y) : [Math.min(0, ...allY), Math.max(...allY)];
+    const a = axes({ W, H, x, y, xlabel: this.dataset.xlabel, ylabel: this.dataset.ylabel, xlog: 'xlog' in this.dataset });
+    let g = a.g;
+    for (const s of series) {
+      const d = s.x.map((v, i) => `${i ? 'L' : 'M'}${a.X(v).toFixed(1)},${a.Y(s.y[i]).toFixed(1)}`).join('');
+      g += `<path d="${d}" fill="none" stroke="${color(s.color)}" stroke-width="5" ${s.dash ? 'stroke-dasharray="14 10"' : ''} stroke-linejoin="round"/>`;
+      const i = s.x.length - 1;
+      g += `<text x="${a.X(s.x[i]) - 6}" y="${a.Y(s.y[i]) - 14}" text-anchor="end" font-size="26" font-weight="600" fill="${color(s.color)}">${esc(s.name)}</text>`;
+    }
+    for (const m of marks) g += `<circle cx="${a.X(m.x)}" cy="${a.Y(m.y)}" r="9" fill="#fff" stroke="${color(m.color)}" stroke-width="4"/>` +
+      `<text x="${a.X(m.x) + 14}" y="${a.Y(m.y) - 14}" font-size="26" fill="${color(m.color)}" font-weight="600">${esc(m.label || '')}</text>`;
+    root.innerHTML = `<style>${BASE} :host { width: 100%; max-width: ${Math.round(W * 580 / H)}px; margin: 0 auto; }</style>` + svg(W, H, g);
+  }
+});
+
+// <bar-chart data-items='[{"label":"InfiLoop","value":90.9,"color":"accent"},{"label":"q = 0","value":84.1,"color":"gray"}]'
+//   [data-max="100"] [data-unit="%"] [data-title="정확도, 1,872층"]>
+customElements.define('bar-chart', class extends HTMLElement {
+  connectedCallback() {
+    const root = once(this); if (!root) return;
+    const items = json(this, 'items', []), max = +(this.dataset.max || Math.max(...items.map(i => i.value)) * 1.1), unit = this.dataset.unit || '';
+    root.innerHTML = `<style>${BASE}
+      .title { font-size: 28px; font-weight: 600; margin-bottom: 14px; }
+      .row { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: center; margin: 12px 0; }
+      .lab { text-align: right; font-size: 28px; } .track { position: relative; height: 44px; }
+      .bar { height: 100%; border-radius: 6px; } .val { position: absolute; top: 4px; font: 600 28px ${MONO}; }</style>
+      ${this.dataset.title ? `<div class="title">${esc(this.dataset.title)}</div>` : ''}
+      ${items.map(i => { const w = Math.max(0.5, i.value / max * 100); return `<div class="row"><div class="lab">${esc(i.label)}</div>
+        <div class="track"><div class="bar" style="width:${w}%;background:${color(i.color)}"></div>
+        <span class="val" style="left:calc(${w}% + 12px)">${fmt(i.value)}${unit}</span></div></div>`; }).join('')}`;
+  }
+});
+
+// <dot-rows data-range="-4,9" data-rows='[{"label":"원래 숫자","values":[2.1,3.4,…],"color":"gray"},
+//   {"label":"AdaLN","expr":"v*(0.5+1.2*p)+2-2.5*p","from":0,"color":"alt"}]'
+//   [data-param="t" data-min="0" data-max="1" data-step="0.01" data-value="0.8" data-readout="'γ = '+(0.5+1.2*p).toFixed(2)"]>
+// A row with "expr" computes its points from row "from" (v = each value, p = the slider).
+customElements.define('dot-rows', class extends HTMLElement {
+  connectedCallback() {
+    const root = once(this); if (!root) return;
+    const rows = json(this, 'rows', []), [lo, hi] = nums(this.dataset.range || '-4,9');
+    const hasP = 'param' in this.dataset;
+    root.innerHTML = `<style>${BASE}
+      .grid { display: grid; grid-template-columns: 260px 1fr; column-gap: 28px; align-items: center; }
+      .lab { font-size: 28px; font-weight: 600; line-height: 1.3; }
+      .ctl { display: flex; align-items: center; gap: 24px; margin-top: 18px; }</style>
+      <div class="grid">${rows.map((r, i) => `<div class="lab" style="color:${r.color === 'gray' ? V('--ink') : color(r.color)}">${esc(r.label)}</div><div class="r" data-i="${i}"></div>`).join('')}</div>
+      ${hasP ? `<div class="ctl"><span>${esc(this.dataset.param)}</span><input type="range" min="${this.dataset.min || 0}" max="${this.dataset.max || 1}" step="${this.dataset.step || 0.01}" value="${this.dataset.value || 0}"><span class="mono read"></span></div>` : ''}`;
+    const fns = rows.map(r => r.expr ? new Function('v', 'p', `return (${r.expr});`) : null);
+    const readout = this.dataset.readout ? new Function('p', `return (${this.dataset.readout});`) : null;
+    const W = 1000, H = 92, X = v => 24 + (v - lo) / (hi - lo) * (W - 48);
+    const ticks = []; for (let v = Math.ceil(lo); v <= hi; v++) if ((v - Math.ceil(lo)) % (hi - lo > 12 ? 2 : 1) === 0) ticks.push(v);
+    const draw = () => {
+      const p = hasP ? +root.querySelector('input').value : 0;
+      rows.forEach((r, i) => {
+        const vals = r.expr ? rows[r.from || 0].values.map(v => fns[i](v, p)) : r.values;
+        const t = ticks.map(v => `<line x1="${X(v)}" x2="${X(v)}" y1="38" y2="54" stroke="#c9ced6" stroke-width="2"/><text x="${X(v)}" y="86" text-anchor="middle" font-size="22" fill="#9aa1ab">${v}</text>`).join('');
+        const dots = vals.map(v => `<circle cx="${X(v).toFixed(1)}" cy="46" r="12" fill="${color(r.color)}" fill-opacity=".85"/>`).join('');
+        root.querySelector(`.r[data-i="${i}"]`).innerHTML = svg(W, H, `<line x1="24" x2="${W - 24}" y1="46" y2="46" stroke="#c9ced6" stroke-width="3"/>${t}${dots}`);
+      });
+      if (hasP) root.querySelector('.read').textContent = `${this.dataset.param} = ${fmt(p)}${readout ? ' · ' + readout(p) : ''}`;
+    };
+    if (hasP) root.querySelector('input').oninput = draw;
+    draw();
+  }
+});
+
+// <slider-plot data-fn="Math.exp(-x*x/(2*s*s))" data-param="s" data-min="0.2" data-max="2" data-value="1"
+//   data-x="-3,3" data-y="0,1.1" [data-fn2="…same parameter, drawn gray for reference…"]
+//   [data-xlabel="z"] [data-ylabel="밀도"] [data-readout="'최댓값 = ' + (1).toFixed(2)"]>
+customElements.define('slider-plot', class extends HTMLElement {
+  connectedCallback() {
+    const root = once(this); if (!root) return;
+    const d = this.dataset, P = d.param || 'p';
+    const f = new Function('x', P, `return (${d.fn});`), f2 = d.fn2 ? new Function('x', P, `return (${d.fn2});`) : null;
+    const readout = d.readout ? new Function(P, `return (${d.readout});`) : null;
+    const W = 1100, H = +(d.height || 460), x = nums(d.x || '0,1'), y = nums(d.y || '0,1');
+    root.innerHTML = `<style>${BASE} :host { width: 100%; max-width: ${Math.round(W * 500 / H)}px; margin: 0 auto; } input[type=range] { width: 520px; } .ctl { display: flex; align-items: center; gap: 24px; margin-top: 12px; }</style>
+      <div class="plot"></div><div class="ctl"><span>${esc(P)}</span><input type="range" min="${d.min || 0}" max="${d.max || 1}" step="${d.step || (+(d.max || 1) - +(d.min || 0)) / 200}" value="${d.value || d.min || 0}"><span class="mono read"></span></div>`;
+    const a = axes({ W, H, x, y, xlabel: d.xlabel, ylabel: d.ylabel });
+    const path = (fn, p) => { let s = ''; for (let i = 0; i <= 240; i++) { const xv = x[0] + (x[1] - x[0]) * i / 240, yv = Math.max(y[0] - 1e3, Math.min(y[1] + 1e3, fn(xv, p))); s += `${i ? 'L' : 'M'}${a.X(xv).toFixed(1)},${a.Y(yv).toFixed(1)}`; } return s; };
+    const draw = () => {
+      const p = +root.querySelector('input').value;
+      root.querySelector('.plot').innerHTML = svg(W, H, `<clipPath id="c"><rect x="${a.L}" y="${a.T}" width="${W - a.L - a.R}" height="${H - a.T - a.B}"/></clipPath>${a.g}
+        <g clip-path="url(#c)">${f2 ? `<path d="${path(f2, p)}" fill="none" stroke="#9aa1ab" stroke-width="4" stroke-dasharray="12 9"/>` : ''}
+        <path d="${path(f, p)}" fill="none" stroke="${V('--accent')}" stroke-width="5"/></g>`);
+      root.querySelector('.read').textContent = `${P} = ${fmt(p)}${readout ? ' · ' + readout(p) : ''}`;
+    };
+    root.querySelector('input').oninput = draw;
+    draw();
+  }
+});
+
+// <step-through [data-loop="4,2"]>
+//   <li data-box="인코더">관측을 벡터로 바꾼다.</li><li data-box="예측기">다음 벡터를 예측한다.</li> …
+// </step-through>
+// Boxes in a row; the current step is highlighted and its sentence shown below. data-loop="from,to"
+// (1-based) draws a return arrow from box "from" back to box "to".
+customElements.define('step-through', class extends HTMLElement {
+  connectedCallback() {
+    const root = once(this); if (!root) return;
+    const steps = [...this.querySelectorAll('li')].map(li => ({ box: li.dataset.box || '', text: li.innerHTML }));
+    const n = steps.length, W = 1500, bw = Math.min(250, (W - 40 * (n - 1)) / n), gap = n > 1 ? (W - bw * n) / (n - 1) : 0, by = 40, bh = 120;
+    const loop = this.dataset.loop ? nums(this.dataset.loop) : null;
+    root.innerHTML = `<style>${BASE}
+      .say { min-height: 100px; margin-top: 18px; font-size: 32px; } .say b { color: ${V('--accent')}; }
+      .ctl { display: flex; gap: 16px; align-items: center; margin-top: 10px; }</style>
+      <div class="pic"></div><div class="say"></div>
+      <div class="ctl"><button class="prev">◀ 이전</button><button class="next">다음 ▶</button><span class="read mono"></span></div>`;
+    let k = 0;
+    const draw = () => {
+      let g = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#8a919b"/></marker></defs>`;
+      steps.forEach((s, i) => {
+        const x = i * (bw + gap), on = i === k;
+        g += `<rect x="${x}" y="${by}" width="${bw}" height="${bh}" rx="18" fill="${on ? V('--accent') : '#fff'}" stroke="${on ? V('--accent') : '#c9ced6'}" stroke-width="3"/>` +
+          `<text x="${x + bw / 2}" y="${by + bh / 2 + 10}" text-anchor="middle" font-size="30" font-weight="600" fill="${on ? '#fff' : V('--ink')}">${esc(s.box)}</text>`;
+        if (i < n - 1) g += `<line x1="${x + bw + 8}" y1="${by + bh / 2}" x2="${x + bw + gap - 10}" y2="${by + bh / 2}" stroke="#8a919b" stroke-width="4" marker-end="url(#ah)"/>`;
+      });
+      if (loop) { const xa = (loop[0] - 1) * (bw + gap) + bw / 2, xb = (loop[1] - 1) * (bw + gap) + bw / 2, yb = by + bh;
+        g += `<path d="M${xa},${yb + 6} V${yb + 50} H${xb} V${yb + 14}" fill="none" stroke="#8a919b" stroke-width="4" marker-end="url(#ah)"/>`; }
+      root.querySelector('.pic').innerHTML = svg(W, by + bh + (loop ? 70 : 20), g);
+      root.querySelector('.say').innerHTML = `<b>${k + 1}. ${esc(steps[k].box)}</b> ${steps[k].text}`;
+      root.querySelector('.read').textContent = `${k + 1} / ${n}`;
+      root.querySelector('.prev').disabled = k === 0; root.querySelector('.next').disabled = k === n - 1;
+    };
+    root.querySelector('.prev').onclick = () => { k = Math.max(0, k - 1); draw(); };
+    root.querySelector('.next').onclick = () => { k = Math.min(n - 1, k + 1); draw(); };
+    draw();
+  }
+});
+
+// <predict-reveal data-question="반복을 네 배로 늘리면 정확도는?" data-options="오른다|그대로다|떨어진다" data-answer="3">
+//   떨어진다. 468층 62.2% → 1,872층 58.1%.
+// </predict-reveal>
+// The element's own text is the answer, shown after any choice (data-answer is 1-based).
+customElements.define('predict-reveal', class extends HTMLElement {
+  connectedCallback() {
+    const root = once(this); if (!root) return;
+    const opts = (this.dataset.options || '').split('|'), ans = +(this.dataset.answer || 0) - 1;
+    root.innerHTML = `<style>${BASE}
+      .q { font-size: 32px; font-weight: 600; margin-bottom: 16px; } .opts { display: flex; gap: 16px; flex-wrap: wrap; }
+      button.right { background: ${V('--accent')}; color: #fff; } button.wrong { border-color: #c9ced6; color: #9aa1ab; }
+      .a { margin-top: 18px; font-size: 30px; } .a[hidden] { display: none; }</style>
+      <div class="q">${esc(this.dataset.question || '')}</div>
+      <div class="opts">${opts.map((o, i) => `<button data-i="${i}">${esc(o)}</button>`).join('')}</div>
+      <div class="a" hidden><slot></slot></div>`;
+    root.querySelectorAll('button').forEach(b => b.onclick = () => {
+      root.querySelectorAll('button').forEach(x => x.classList.add(+x.dataset.i === ans ? 'right' : 'wrong'));
+      root.querySelector('.a').hidden = false;
+    });
+  }
+});
+</script>
+<script type="module">
+/* LeHami deck: the running phase-plane figure and the SG fit. Pendulum with g/L = 9.81, frame step 0.1 s. */
+const css = getComputedStyle(document.documentElement);
+const V = n => css.getPropertyValue(n).trim();
+const FONT = '"IBM Plex Sans KR", sans-serif', MONO = '"IBM Plex Mono", monospace';
+const W2 = 9.81, DT = 0.1;
+const ACC = () => V('--accent') || '#2f5fb3', ALT = () => V('--alt') || '#c05f0c';
+const leap = (q, p, h) => { p = p - h / 2 * W2 * Math.sin(q); q = q + h * p; p = p - h / 2 * W2 * Math.sin(q); return [q, p]; };
+const euler = (q, p, h) => [q + h * p, p - h * W2 * Math.sin(q)];
+const area = pts => { let a = 0; for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; a += x1 * y2 - x2 * y1; } return Math.abs(a) / 2; };
+const disk = (cq, cp, r, n = 720) => Array.from({ length: n }, (_, i) => [cq + r * Math.cos(2 * Math.PI * i / n), cp + r * Math.sin(2 * Math.PI * i / n)]);
+
+// A phase plane: q (angle) across, p (angular velocity) up, with level sets of the true pendulum energy.
+function plane(W, H, QR = [-1.9, 1.9], PR = [-4.2, 4.2]) {
+  const L = 80, R = 20, T = 16, B = 64;
+  const X = q => L + (q - QR[0]) / (QR[1] - QR[0]) * (W - L - R);
+  const Y = p => H - B - (p - PR[0]) / (PR[1] - PR[0]) * (H - T - B);
+  let g = `<defs><clipPath id="c"><rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}"/></clipPath></defs>`;
+  g += `<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="#fff" stroke="#e3e6ea" stroke-width="2"/>`;
+  for (const E of [1, 3, 6, 10, 15]) {
+    const up = [], dn = [];
+    for (let i = 0; i <= 400; i++) {
+      const q = QR[0] + (QR[1] - QR[0]) * i / 400, k = E - W2 * (1 - Math.cos(q));
+      if (k >= 0) { const p = Math.min(Math.sqrt(2 * k), PR[1]), m = Math.max(-Math.sqrt(2 * k), PR[0]); up.push([X(q), Y(p)]); dn.push([X(q), Y(m)]); }
+    }
+    const d = [...up, ...dn.reverse()].map((v, i) => `${i ? 'L' : 'M'}${v[0].toFixed(1)},${v[1].toFixed(1)}`).join('') + 'Z';
+    g += `<path d="${d}" fill="none" stroke="#dfe3e8" stroke-width="2" clip-path="url(#c)"/>`;
+  }
+  g += `<line x1="${X(0)}" x2="${X(0)}" y1="${T}" y2="${H - B}" stroke="#eef0f3" stroke-width="2"/><line x1="${L}" x2="${W - R}" y1="${Y(0)}" y2="${Y(0)}" stroke="#eef0f3" stroke-width="2"/>`;
+  for (const q of [-1.5, 0, 1.5].filter(v => v >= QR[0] && v <= QR[1])) g += `<text x="${X(q)}" y="${H - B + 30}" text-anchor="middle" font-size="22" fill="#8a919b">${q}</text>`;
+  for (const p of [-4, 0, 4].filter(v => v >= PR[0] && v <= PR[1])) g += `<text x="${L - 12}" y="${Y(p) + 8}" text-anchor="end" font-size="22" fill="#8a919b">${p}</text>`;
+  g += `<text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle" font-size="24" fill="#6b7280">q: 각도 (rad)</text>`;
+  g += `<text x="${L + 10}" y="${T + 8}" font-size="24" fill="#6b7280" dominant-baseline="hanging">p: 각속도 (rad/s)</text>`;
+  return { X, Y, g, L, T, W, H, B, R };
+}
+const poly = (P, pts, col) => `<path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${P.X(v[0]).toFixed(1)},${P.Y(v[1]).toFixed(1)}`).join('')}Z" fill="${col}" fill-opacity=".28" stroke="${col}" stroke-width="3" clip-path="url(#c)"/>`;
+const STYLE = `:host { display: block; overflow: hidden; font: 30px/1.4 ${FONT}; color: ${V('--ink')}; } svg { display: block; }
+  .ctl { display: flex; align-items: center; gap: 24px; margin-top: 12px; }
+  input { width: 600px; accent-color: ${V('--accent')}; }
+  .mono { font-family: ${MONO}; font-size: 28px; }
+  .read { font-size: 28px; color: ${V('--muted')}; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  .lab { font-size: 28px; font-weight: 600; margin-bottom: 4px; }`;
+
+// <phase-cloud data-mode="flow|compare" data-max="40" data-value="0">
+//   flow: one cloud moved by the true pendulum motion (leapfrog with 20 sub-steps per frame);
+//   compare: explicit Euler and leapfrog, one step per frame, side by side.
+customElements.define('phase-cloud', class extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const root = this.attachShadow({ mode: 'open' });
+    const mode = this.dataset.mode || 'flow', max = +(this.dataset.max || 40), start = +(this.dataset.value || 0);
+    const cmp = mode === 'compare';
+    const W = cmp ? 780 : 900, H = cmp ? 360 : 560;
+    root.innerHTML = `<style>${STYLE}</style>` + (cmp
+      ? `<div class="row"><div><div class="lab" style="color:${ALT()}">explicit Euler</div><div class="a"></div><div class="read ra"></div></div>
+         <div><div class="lab" style="color:${ACC()}">leapfrog</div><div class="b"></div><div class="read rb"></div></div></div>`
+      : `<div class="a"></div><div class="read ra"></div>`) +
+      `<div class="ctl"><span>스텝 수 K</span><input type="range" min="0" max="${max}" step="1" value="${start}"><span class="mono kv"></span></div>`;
+    const c0 = disk(0.8, 0, 0.35), A0 = area(c0);
+    const run = (f, k, sub) => c0.map(([q, p]) => { for (let i = 0; i < k * sub; i++) [q, p] = f(q, p, DT / sub); return [q, p]; });
+    const input = root.querySelector('input');
+    const draw = () => {
+      const k = +input.value;
+      root.querySelector('.kv').textContent = `K = ${k} (${(k * DT).toFixed(1)}초)`;
+      if (cmp) {
+        const e = run(euler, k, 1), l = run(leap, k, 1);
+        const P = plane(W, H);
+        root.querySelector('.a').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" font-family='${FONT}'>${P.g}${poly(P, c0, '#9aa1ab')}${poly(P, e, ALT())}</svg>`;
+        root.querySelector('.b').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" font-family='${FONT}'>${P.g}${poly(P, c0, '#9aa1ab')}${poly(P, l, ACC())}</svg>`;
+        root.querySelector('.ra').textContent = `넓이: 처음의 ${(area(e) / A0).toFixed(2)}배`;
+        root.querySelector('.rb').textContent = `넓이: 처음의 ${(area(l) / A0).toFixed(2)}배`;
+      } else {
+        const l = run(leap, k, 20), P = plane(W, H);
+        root.querySelector('.a').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" font-family='${FONT}'>${P.g}${poly(P, c0, '#9aa1ab')}${poly(P, l, ACC())}</svg>`;
+        root.querySelector('.ra').textContent = `회색: 처음 상태들, 파랑: K스텝 뒤. 넓이는 처음의 ${(area(l) / A0).toFixed(2)}배`;
+      }
+    };
+    input.oninput = draw; draw();
+  }
+});
+
+// <phase-merge>: two states with the same angle and opposite velocity, their true next states, and the average.
+customElements.define('phase-merge', class extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const root = this.attachShadow({ mode: 'open' });
+    const W = 900, H = 540, P = plane(W, H, [-0.1, 1.6], [-2.2, 1.6]);
+    const pts = [[0.5, 1.0], [0.5, -1.0]], nx = [[0.575, 0.494], [0.378, -1.420]], mean = [0.477, -0.463];
+    const dot = (v, col, r = 13) => `<circle cx="${P.X(v[0])}" cy="${P.Y(v[1])}" r="${r}" fill="${col}"/>`;
+    const arrow = (a, b, col) => {
+      const x1 = P.X(a[0]), y1 = P.Y(a[1]), x2 = P.X(b[0]), y2 = P.Y(b[1]), L = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / L, uy = (y2 - y1) / L;
+      const ex = x2 - ux * 16, ey = y2 - uy * 16, hx = ex - ux * 16, hy = ey - uy * 16;
+      return `<line x1="${x1}" y1="${y1}" x2="${hx}" y2="${hy}" stroke="${col}" stroke-width="4"/>` +
+        `<path d="M${ex},${ey}L${hx - uy * 9},${hy + ux * 9}L${hx + uy * 9},${hy - ux * 9}Z" fill="${col}"/>`;
+    };
+    const lab = (v, t, col, dx = 22, dy = 8, anchor = 'start') => `<text x="${P.X(v[0]) + dx}" y="${P.Y(v[1]) + dy}" font-size="25" fill="${col}" text-anchor="${anchor}">${t}</text>`;
+    let g = P.g;
+    g += arrow(pts[0], nx[0], '#6b7280') + arrow(pts[1], nx[1], '#6b7280');
+    g += pts.map(v => dot(v, '#1d2026')).join('') + nx.map(v => dot(v, '#6b7280')).join('') + dot(mean, ALT(), 15);
+    g += lab(pts[0], '지금 (0.5, +1)', '#1d2026', -20, -14, 'end') + lab(pts[1], '지금 (0.5, −1)', '#1d2026', -20, -14, 'end');
+    g += lab(nx[0], '0.1초 뒤 (0.575, 0.494)', '#6b7280', 22, -10) + lab(nx[1], '0.1초 뒤 (0.378, −1.420)', '#6b7280', 22, 30);
+    g += lab(mean, '평균 예측 (0.477, −0.463)', ALT(), 24, 8);
+    root.innerHTML = `<style>${STYLE}</style><svg viewBox="0 0 ${W} ${H}" width="100%" font-family='${FONT}'>${g}</svg>`;
+  }
+});
+
+// <sg-fit data-y="…4 angles…" data-true="-0.19">: a quadratic least-squares fit to four frames, its slope at the last one,
+// and the two-frame difference for comparison.
+customElements.define('sg-fit', class extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const root = this.attachShadow({ mode: 'open' });
+    const y = this.dataset.y.split(',').map(Number), tr = +this.dataset.true;
+    const ts = [-3, -2, -1, 0];
+    // least squares quadratic in t (frames): normal equations
+    const S = k => ts.reduce((s, t) => s + t ** k, 0), Sy = k => ts.reduce((s, t, i) => s + t ** k * y[i], 0);
+    const M = [[S(0), S(1), S(2)], [S(1), S(2), S(3)], [S(2), S(3), S(4)]], b = [Sy(0), Sy(1), Sy(2)];
+    const det3 = m => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    const D = det3(M), c = [0, 1, 2].map(j => det3(M.map((r, i) => r.map((v, k) => k === j ? b[i] : v))) / D);
+    const sg = c[1] / DT, bd = (y[3] - y[2]) / DT;
+    const W = 860, H = 380, L = 90, R = 30, T = 20, B = 70, y0 = 0.28, y1 = 0.46;
+    const X = t => L + (t + 3.3) / 3.8 * (W - L - R), Y = v => H - B - (v - y0) / (y1 - y0) * (H - T - B);
+    let g = `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="#c9ced6" stroke-width="2"/>`;
+    ts.forEach(t => g += `<text x="${X(t)}" y="${H - B + 34}" text-anchor="middle" font-size="24" fill="#8a919b">${t === 0 ? 't' : 't' + t}</text>`);
+    [0.3, 0.35, 0.4, 0.45].forEach(v => g += `<text x="${L - 12}" y="${Y(v) + 8}" text-anchor="end" font-size="22" fill="#8a919b">${v}</text><line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#eef0f3" stroke-width="2"/>`);
+    g += `<text x="${L + 8}" y="${T + 4}" font-size="24" fill="#6b7280" dominant-baseline="hanging">각도 (rad)</text>`;
+    let d = ''; for (let i = 0; i <= 60; i++) { const t = -3.2 + 3.6 * i / 60; d += `${i ? 'L' : 'M'}${X(t).toFixed(1)},${Y(c[0] + c[1] * t + c[2] * t * t).toFixed(1)}`; }
+    g += `<path d="${d}" fill="none" stroke="${ACC()}" stroke-width="3" stroke-dasharray="8 7"/>`;
+    const tan = (s, col) => `<line x1="${X(-0.9)}" y1="${Y(c[0] - 0.9 * s * DT)}" x2="${X(0.3)}" y2="${Y(c[0] + 0.3 * s * DT)}" stroke="${col}" stroke-width="6"/>`;
+    g += tan(sg, ACC());
+    g += `<line x1="${X(-1)}" y1="${Y(y[2])}" x2="${X(0.3)}" y2="${Y(y[3] + 0.3 * (y[3] - y[2]))}" stroke="${ALT()}" stroke-width="6"/>`;
+    y.forEach((v, i) => g += `<circle cx="${X(ts[i])}" cy="${Y(v)}" r="13" fill="#1d2026"/>`);
+    root.innerHTML = `<style>${STYLE} .k { display:flex; gap: 40px; font-size: 28px; margin-top: 6px; }</style>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" font-family='${FONT}'>${g}</svg>
+      <div class="k"><span style="color:${ACC()}">2차 맞춤의 기울기 ${sg.toFixed(2)}</span><span style="color:${ALT()}">두 프레임 차이 ${bd >= 0 ? '+' : ''}${bd.toFixed(2)}</span><span>실제 ${tr.toFixed(2)}</span></div>`;
+  }
+});
+</script>
+</head>
+<body>
+<main class="deck" data-size="1920x1080">
+  <!-- 1. 표지 -->
+  <section class="slide title">
+    <h1>LeHami: Hamiltonian leapfrog 스텝으로 예측하는 JEPA world model</h1>
+    <p class="answer">LeHami는 JEPA world model이다. predictor 자리에 학습한 Hamiltonian의 leapfrog 스텝을 쓴다. 그래서 모든 예측 스텝에서 잠재 상태의 부피가 바뀌지 않는다.</p>
+    <p class="meta">Yalovetzky, Balestriero, LeCun. arXiv 2610.15267 · 짧은 문장판(ASD-STE100 방식) · 2026-10-30 · Wonder</p>
+  </section>
+
+  <!-- 2. rollout -->
+  <section class="slide">
+    <h2>rollout은 predictor의 예측을 다시 입력으로 쓴다</h2>
+    <div class="side">
+      <div class="text">
+        <ul>
+          <li>encoder는 프레임을 잠재 상태로 바꾼다.</li>
+          <li>predictor는 지금 잠재 상태와 행동으로 다음 잠재 상태를 계산한다.</li>
+          <li>계획에는 여러 스텝의 예측이 필요하다. 그래서 predictor는 자기 예측을 다음 입력으로 쓴다. 이것이 rollout이다.</li>
+          <li>한 스텝은 한 프레임(0.1초)이다.</li>
+        </ul>
+        <p>스텝마다 부피가 2% 줄면, 50스텝 뒤에 <b>36%만 남는다</b>.</p>
+      </div>
+      <div class="fig">
+        <slider-plot data-fn="Math.pow(c, x)" data-param="c" data-min="0.9" data-max="1" data-value="0.98" data-x="0,70" data-y="0,1.05" data-xlabel="rollout 스텝 수" data-ylabel="남은 부피 (처음 = 1)" data-readout="'스텝당 ' + c.toFixed(3) + '배 → 50스텝 뒤 ' + Math.pow(c, 50).toFixed(2) + '배'"></slider-plot>
+        <p class="note">스텝당 배율은 설명용 가정이다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 평균 예측 -->
+  <section class="slide">
+    <h2>제곱오차 predictor는 다른 두 상태를 한 점으로 합친다</h2>
+    <div class="side">
+      <div class="text">
+        <ul>
+          <li>제곱오차는 평균 예측에서 가장 작다.</li>
+          <li>프레임 한 장에는 속도가 없다.</li>
+          <li>그래서 입력은 속도만 다른 두 진자를 구분하지 못한다.</li>
+          <li>predictor는 두 진자에 같은 평균값을 낸다.</li>
+        </ul>
+        <p>두 점이 한 점이 된다. 그래서 <b>부피가 줄어든다</b>.</p>
+      </div>
+      <div class="fig">
+        <phase-merge></phase-merge>
+        <p class="note">설명용 예시: 길이 1 m 진자의 0.1초 뒤 상태를 직접 계산했다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Hamiltonian 흐름 -->
+  <section class="slide">
+    <h2>Hamiltonian 흐름은 부피를 바꾸지 않는다</h2>
+    <div class="side">
+      <div class="text">
+        <ul>
+          <li>진자 상태는 두 값이다. 각도 q와 각속도 p다.</li>
+          <li>Hamiltonian <span class="math">H(q,p)</span>는 에너지다.</li>
+          <li>상태는 <span class="math">\dot q = \partial H/\partial p</span>, <span class="math">\dot p = -\partial H/\partial q</span>로 바뀐다.</li>
+        </ul>
+        <p>이 흐름에서 상태 집합의 모양은 바뀐다. 그러나 <b>부피는 바뀌지 않는다</b>(Liouville 정리).</p>
+      </div>
+      <div class="fig">
+        <phase-cloud data-mode="flow" data-max="40" data-value="12"></phase-cloud>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. leapfrog -->
+  <section class="slide">
+    <h2>leapfrog 스텝은 부피를 정확히 지킨다</h2>
+    <div class="cols2">
+      <ol>
+        <li>p를 반 스텝 바꾼다. V의 기울기를 쓴다.</li>
+        <li>q를 한 스텝 바꾼다. K의 기울기를 쓴다.</li>
+        <li>p를 다시 반 스텝 바꾼다.</li>
+      </ol>
+      <p>각 단계는 한 값만 바꾼다. 바꾸는 양은 다른 값에만 따른다. 그래서 각 단계의 행렬식은 1이다. <b>K와 V의 가중치와 관계없이</b> 1이다.</p>
+    </div>
+    <div class="fig">
+      <phase-cloud data-mode="compare" data-max="20" data-value="10"></phase-cloud>
+    </div>
+  </section>
+
+  <!-- 6. LeHami 구조 -->
+  <section class="slide">
+    <h2>LeHami는 predictor를 leapfrog 스텝으로 바꾼다</h2>
+    <div class="text">
+      <ul>
+        <li>잠재 상태는 q(32개 값)와 p(32개 값)이다.</li>
+        <li>K와 V는 신경망(MLP)이다.</li>
+        <li>행동 u는 V에 들어간다. 한 스텝 동안 u는 바뀌지 않는다. 그래서 <b>행렬식은 계속 1</b>이다.</li>
+      </ul>
+    </div>
+    <div class="eq">
+      <div class="math display">\tilde p = p - \tfrac{\Delta t}{2}\,\textcolor{#c05f0c}{\nabla_q V(q,u)},\quad q' = q + \Delta t\,\textcolor{#2f5fb3}{\nabla K(\tilde p)},\quad p' = \tilde p - \tfrac{\Delta t}{2}\,\textcolor{#c05f0c}{\nabla_q V(q',u)}</div>
+      <p class="terms"><span class="orange">주황</span>은 V의 기울기다. <span class="blue">파랑</span>은 K의 기울기다. Δt는 0.1초다.</p>
+    </div>
+    <details><summary>수식에서 뺀 것</summary>
+      <p>논문은 p의 크기를 맞추는 대각 행렬 S도 학습한다. S는 q 갱신에만 들어간다. 학습 후 S의 값은 0.95–1.09다.</p>
+    </details>
+  </section>
+
+  <!-- 7. 세 가지 보장 -->
+  <section class="slide">
+    <h2>부피 보존은 붕괴 세 가지를 막는다</h2>
+    <div class="text">
+      <p>논문은 세 결과를 증명한다.</p>
+      <ul>
+        <li>rollout은 모든 방향으로 동시에 줄지 않는다.</li>
+        <li>주변 상태를 끌어들이는 안정한 고정점이 없다.</li>
+        <li>다른 두 상태는 모든 스텝에서 다르다.</li>
+      </ul>
+      <p>이 결과는 <b>모든 가중치와 모든 행동 순서</b>에서 참이다.</p>
+      <p class="callout">주의: 부피 보존은 오차 증가를 막지 못한다. 모양은 크게 바뀔 수 있다. encoder에는 정규화(SIGReg)가 계속 필요하다. 입력이 같은 두 상태는 구분하지 못한다. 그래서 상태에 속도가 있어야 한다.</p>
+    </div>
+  </section>
+
+  <!-- 8. p 계산 -->
+  <section class="slide">
+    <h2>p는 학습하지 않고 q에서 계산한다</h2>
+    <div class="side">
+      <div class="text">
+        <ul>
+          <li>encoder는 프레임 한 장에서 q만 만든다.</li>
+          <li>최근 q 네 개에 2차식을 맞춘다. 지금 시점의 기울기가 p다(Savitzky–Golay 필터).</li>
+          <li>필터에는 파라미터가 없다. 그래서 필터는 붕괴하지 않는다.</li>
+        </ul>
+        <p>필터는 <b>속도의 부호</b>도 지킨다.</p>
+      </div>
+      <div class="fig">
+        <sg-fit data-y="0.3084,0.3873,0.4295,0.4311" data-true="-0.19"></sg-fit>
+        <p class="note">실제 진자를 0.1초 간격으로 계산한 각도 네 개다.</p>
+      </div>
+    </div>
+    <details><summary>필터 가중치</summary>
+      <p><span class="math">p_t = (0.45\,q_{t-3} - 0.85\,q_{t-2} - 0.65\,q_{t-1} + 1.05\,q_t)/\Delta t</span>. 학습 타깃의 p는 앞뒤 두 프레임을 쓴다: <span class="math">(-2,-1,0,1,2)/(10\Delta t)</span>.</p>
+    </details>
+  </section>
+
+  <!-- 9. 학습 -->
+  <section class="slide">
+    <h2>학습은 8스텝 rollout의 오차를 줄인다</h2>
+    <div class="text">
+      <p>baseline LeWM과 encoder, 잠재 차원 64, 데이터가 같다. <b>predictor만 다르다</b>. LeWM의 predictor는 최근 잠재 상태 세 개를 보는 transformer다.</p>
+    </div>
+    <div class="fig">
+      <step-through>
+        <li data-box="encoder">encoder가 프레임마다 q를 만든다.</li>
+        <li data-box="필터">시작 시점(anchor)에서 필터가 p를 만든다.</li>
+        <li data-box="leapfrog">모델이 leapfrog 스텝을 8번 한다.</li>
+        <li data-box="손실">손실이 예측 (q, p)와 실제 프레임의 (q, p)를 비교한다. q에는 SIGReg를 건다.</li>
+        <li data-box="역전파">기울기가 8스텝을 거쳐 encoder, K, V로 간다.</li>
+      </step-through>
+    </div>
+  </section>
+
+  <!-- 10. 보존 진자 결과 -->
+  <section class="slide">
+    <h2>보존 진자에서 LeHami는 각속도 오차가 작고 부피가 일정하다</h2>
+    <div class="cols2">
+      <ul>
+        <li>시험 데이터: 64×64 진자 영상, 행동 없음</li>
+        <li>측정: k-NN probe가 잠재 상태에서 각도와 각속도를 읽는다.</li>
+      </ul>
+      <ul>
+        <li>각속도 오차: 처음 10스텝에서 <b>2.8배 작다</b>. 21–70스텝 평균에서 1.5배 작다.</li>
+        <li>부피: LeHami는 일정하다. LeWM은 스텝마다 준다(이 그림은 seed 1개).</li>
+      </ul>
+    </div>
+    <div class="fig">
+      <img src="assets/fig4.webp" alt="rollout 스텝에 따른 각도 오차, 각속도 오차, 누적 log-volume">
+      <p class="src">논문 Figure 4 (초록 LeHami, 분홍 LeWM)</p>
+    </div>
+  </section>
+
+  <!-- 11. 스텝 크기와 역방향 -->
+  <section class="slide">
+    <h2>같은 H로 작은 스텝과 역방향 예측을 할 수 있다</h2>
+    <div class="cols2">
+      <ul>
+        <li>학습 스텝은 Δt = 0.1초뿐이다.</li>
+        <li>Δt/2, Δt/4: <b>궤적이 거의 같다</b>.</li>
+      </ul>
+      <ul>
+        <li>2Δt: 예측이 실패한다.</li>
+        <li>−Δt로 30스텝 갔다 오면 오차는 10⁻⁴ % 아래다.</li>
+      </ul>
+    </div>
+    <div class="fig">
+      <img src="assets/fig5.webp" alt="스텝 크기별 각도 오차와 왕복 오차">
+      <p class="src">논문 Figure 5</p>
+    </div>
+  </section>
+
+  <!-- 12. 계획 -->
+  <section class="slide">
+    <h2>행동이 있는 진자의 계획에서는 LeWM 변형이 더 자주 성공한다</h2>
+    <div class="side">
+      <div class="text">
+        <ul>
+          <li>시험: 무작위 토크로 움직인 진자. 목표는 30스텝 뒤 상태다.</li>
+          <li>성공: 각도 오차 0.1 rad 안, 각속도 오차 0.5 rad/s 안</li>
+          <li>속도 목표: LeHami 0.527, 세 프레임 LeWM(비대칭) <b>0.800</b></li>
+          <li>위치 목표: 한 프레임 LeWM 0.800, LeHami 0.480</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <bar-chart data-max="1" data-title="속도 목표 성공률"
+          data-items='[{"label":"LeWM 한 프레임","value":0.184,"color":"gray"},{"label":"LeWM 세 프레임, 대칭","value":0.473,"color":"gray"},{"label":"LeWM 세 프레임, 비대칭","value":0.800,"color":"alt"},{"label":"LeHami","value":0.527,"color":"accent"}]'></bar-chart>
+        <bar-chart data-max="1" data-title="위치 목표 성공률"
+          data-items='[{"label":"LeWM 한 프레임","value":0.800,"color":"alt"},{"label":"LeHami","value":0.480,"color":"accent"}]'></bar-chart>
+      </div>
+    </div>
+    <details><summary>조건</summary>
+      <p>에피소드당 연산은 15 TFLOP 이하다. CEM이 행동을 찾고, 몇 스텝마다 다시 계획한다. LeHami는 속도 목표에서 6스텝마다 다시 계획했다. 대칭 가중치 [a, b, a] encoder는 속도의 부호를 잃는다. 위치와 속도를 함께 맞히는 목표: 한 프레임 LeWM 0.142, 대칭 0.400, 비대칭 0.636, LeHami 0.304.</p>
+    </details>
+  </section>
+
+  <!-- 13. 정리 -->
+  <section class="slide">
+    <h2>LeHami는 부피를 보장하고, 시험은 진자 두 개뿐이다</h2>
+    <div class="text">
+      <ul>
+        <li>보장: <b>모든 스텝에서 부피가 같다</b>. 가중치와 행동에 관계없다.</li>
+        <li>결과: 보존 진자에서 각속도 예측이 좋아졌다. 계획에서는 LeWM 변형이 더 좋았다.</li>
+        <li>한계: 마찰처럼 부피가 줄어드는 시스템은 모델링하지 못한다. 질량이 위치에 따라 바뀌면 고정 필터가 맞지 않는다.</li>
+      </ul>
+    </div>
+    <div class="refs">
+      <p>Romina Yalovetzky, Randall Balestriero, Yann LeCun. LeHami: Symplectic Latent Dynamics for World Models. arXiv 2610.15267, 2026</p>
+      <p>논문에서 온 것: 방법, 증명, 실험 수치, Figure 4·5. 직접 계산한 것: 2% 예시, 두 진자 상태와 평균, 부피 그림, Euler 비교, 필터 예시.</p>
+    </div>
+  </section>
+
+</main>
+<script src="deck-edit.js"></script>
+</body>
+</html>
